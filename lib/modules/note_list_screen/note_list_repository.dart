@@ -22,7 +22,7 @@ class NoteListRepositoryImpl implements NoteListRepository {
   Future<void> addLocalNote(String userId, NoteItem noteItem, {bool isAddToRemote = false}) async {
     if (isAddToRemote) noteItem.timestamp = DateTime.now().millisecondsSinceEpoch;
     await _dbHelper.save(noteItem);
-    if (isAddToRemote) addRemoteNote(userId, noteItem);
+    if (isAddToRemote && userId.isNotEmpty) addRemoteNote(userId, noteItem);
   }
 
   @override

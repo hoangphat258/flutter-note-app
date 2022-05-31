@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_note_app/model/note_item.dart';
 import 'package:flutter_note_app/modules/edit_note_screen/edit_note_bloc.dart';
@@ -11,12 +12,12 @@ class EditNotePage extends StatefulWidget {
     Key? key,
     this.noteItem,
     this.isCreateNew = false,
-    this.onUpdateSuccessfuly,
+    this.onUpdateSuccessfully,
   }) : super(key: key);
 
   final NoteItem? noteItem;
   final bool isCreateNew;
-  final Function(bool)? onUpdateSuccessfuly;
+  final Function(bool)? onUpdateSuccessfully;
 
   @override
   State<EditNotePage> createState() => _EditNotePageState();
@@ -27,6 +28,7 @@ class _EditNotePageState extends State<EditNotePage> {
   final TextEditingController _descriptionTextController =
       TextEditingController();
   final _noteController = Get.put<EditNoteBloc>(EditNoteBloc());
+  final _focusNode = FocusNode();
   late StreamSubscription _updatedSuccessfullyStream, _alertMessageStream;
 
   @override
@@ -35,9 +37,13 @@ class _EditNotePageState extends State<EditNotePage> {
     _titleTextController.text = widget.noteItem?.title ?? "";
     _descriptionTextController.text = widget.noteItem?.description ?? "";
 
+    if (_titleTextController.text.isEmpty || _descriptionTextController.text.isEmpty) {
+      _focusNode.requestFocus();
+    }
+
     _updatedSuccessfullyStream =
         _noteController.isUpdatedSuccessfully.listen((isUpdatedSuccessfully) {
-      widget.onUpdateSuccessfuly?.call(isUpdatedSuccessfully);
+      widget.onUpdateSuccessfully?.call(isUpdatedSuccessfully);
       Get.back();
       _noteController.isUpdatedSuccessfully.value = false;
     });
@@ -72,45 +78,51 @@ class _EditNotePageState extends State<EditNotePage> {
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 50,),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const SizedBox(
-                  height: 8,
+          child: Column(
+            children: [
+              TextField(
+                controller: _titleTextController,
+                focusNode: _focusNode,
+                maxLines: null,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
                 ),
-                Column(
-                  children: [
-                    TextField(
-                      controller: _titleTextController,
-                      maxLines: null,
-                    ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                    TextField(
-                      controller: _descriptionTextController,
-                      maxLines: null,
-                    ),
-                  ],
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
                 ),
-              ],
-            ),
+                textInputAction: TextInputAction.next,
+              ),
+              Expanded(
+                child: TextField(
+                  controller: _descriptionTextController,
+                  maxLines: null,
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         Positioned(
           bottom: 0,
+          left: 20,
+          right: 20,
           child: ElevatedButton(
             onPressed: () {
               widget.isCreateNew
                   ? _noteController.addNote(
-                  "1234",
+                  FirebaseAuth.instance.currentUser?.uid ?? "",
                   NoteItem(
                     title: _titleTextController.text,
                     description: _descriptionTextController.text,
                   ))
                   : _noteController.updateNote(
-                  "1234",
+                  FirebaseAuth.instance.currentUser?.uid ?? "",
                   NoteItem(
                     id: widget.noteItem?.id,
                     title: _titleTextController.text,
