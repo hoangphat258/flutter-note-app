@@ -3,8 +3,7 @@
 This is a simple note app that using local storage (SQL) and firestore database. This project uses GetX for state management.
 
 ## Testing account
-Email: phatho@yopmail.com
-Password: 123456789
+Email: phatho@yopmail.com / Password: 123456789
 
 ## Code Structure
 - All structure folders are stored at ***lib*** folder:
