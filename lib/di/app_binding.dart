@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
-import '../module/note_list_screen/note_list_repository.dart';
+import '../modules/note_list_screen/note_list_repository.dart';
 
 class AppBinding implements Bindings {
 

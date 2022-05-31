@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 import 'db/db_helper.dart';
 import 'di/app_binding.dart';
-import 'module/note_list_screen/note_list_screen.dart';
+import 'modules/note_list_screen/note_list_screen.dart';
 
 final _firebaseAuth = Get.put(FirebaseAuth.instance);
 

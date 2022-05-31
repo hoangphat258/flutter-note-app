@@ -17,7 +17,7 @@ class NoteItem {
 
   static NoteItem fromJson(Map<String, dynamic> json) => NoteItem(
       id: json["id"],
-      firestoreId: json["firestoreid"],
+      firestoreId: json["firestoreId"],
       title: json["title"],
       description: json["description"],
       timestamp: json["timestamp"],
