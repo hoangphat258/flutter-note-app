@@ -37,7 +37,8 @@ class _EditNotePageState extends State<EditNotePage> {
     _titleTextController.text = widget.noteItem?.title ?? "";
     _descriptionTextController.text = widget.noteItem?.description ?? "";
 
-    if (_titleTextController.text.isEmpty || _descriptionTextController.text.isEmpty) {
+    if (_titleTextController.text.isEmpty ||
+        _descriptionTextController.text.isEmpty) {
       _focusNode.requestFocus();
     }
 
@@ -65,8 +66,54 @@ class _EditNotePageState extends State<EditNotePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Edit Note"),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: GestureDetector(
+          onTap: () {
+            final noteItemTitle = widget.noteItem?.title ?? "";
+            final noteItemDescription = widget.noteItem?.description ?? "";
+            if (noteItemTitle != _titleTextController.text ||
+                noteItemDescription != _descriptionTextController.text) {
+              if (widget.isCreateNew) {
+                _noteController.addNote(
+                    FirebaseAuth.instance.currentUser?.uid ?? "",
+                    NoteItem(
+                      title: _titleTextController.text,
+                      description: _descriptionTextController.text,
+                    ));
+                Navigator.pop(context);
+              } else {
+                final updatedNote = NoteItem(
+                  id: widget.noteItem?.id,
+                  title: _titleTextController.text,
+                  description: _descriptionTextController.text,
+                );
+                _noteController.updateNote(
+                    FirebaseAuth.instance.currentUser?.uid ?? "", updatedNote);
+                Navigator.pop(context, updatedNote);
+              }
+            } else {
+              Navigator.pop(context);
+            }
+          },
+          child: Row(
+            children: const [
+              Icon(
+                Icons.arrow_back_ios,
+                color: Color(0xffddaf07),
+              ),
+              Text(
+                "All Notes",
+                style: TextStyle(
+                  color: Color(0xffddaf07),
+                ),
+              )
+            ],
+          ),
+        ),
+        automaticallyImplyLeading: false,
       ),
       body: _buildLayout(),
     );
@@ -77,9 +124,15 @@ class _EditNotePageState extends State<EditNotePage> {
       fit: StackFit.loose,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 50,),
+          padding: const EdgeInsets.only(
+            left: 8,
+            right: 8,
+            top: 8,
+          ),
           child: Column(
             children: [
+              Text(
+                  "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year} at ${DateTime.now().hour}:${DateTime.now().minute}"),
               TextField(
                 controller: _titleTextController,
                 focusNode: _focusNode,
@@ -96,6 +149,7 @@ class _EditNotePageState extends State<EditNotePage> {
               Expanded(
                 child: TextField(
                   controller: _descriptionTextController,
+                  textInputAction: TextInputAction.done,
                   maxLines: null,
                   style: const TextStyle(
                     fontSize: 16,
@@ -106,30 +160,6 @@ class _EditNotePageState extends State<EditNotePage> {
                 ),
               ),
             ],
-          ),
-        ),
-        Positioned(
-          bottom: 0,
-          left: 20,
-          right: 20,
-          child: ElevatedButton(
-            onPressed: () {
-              widget.isCreateNew
-                  ? _noteController.addNote(
-                  FirebaseAuth.instance.currentUser?.uid ?? "",
-                  NoteItem(
-                    title: _titleTextController.text,
-                    description: _descriptionTextController.text,
-                  ))
-                  : _noteController.updateNote(
-                  FirebaseAuth.instance.currentUser?.uid ?? "",
-                  NoteItem(
-                    id: widget.noteItem?.id,
-                    title: _titleTextController.text,
-                    description: _descriptionTextController.text,
-                  ));
-            },
-            child: Text(widget.isCreateNew ? "Save" : "Update"),
           ),
         ),
         Obx(() => _noteController.isLoading.isTrue

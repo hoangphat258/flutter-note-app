@@ -25,7 +25,9 @@ class MyApp extends StatelessWidget {
       initialBinding: AppBinding(),
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: const Color(0xffddaf07),
+        ),
       ),
       home: const NoteListScreen(),
     );
