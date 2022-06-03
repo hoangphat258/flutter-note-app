@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 extension NumExtension on int {
   String convertTimestampToString() {
     final now = DateTime.now();
@@ -9,7 +11,35 @@ extension NumExtension on int {
       return "Today";
     } else if(aDate == yesterday) {
       return "Yesterday";
+    } else if (weekNumber(aDate) == weekNumber(now) && aDate.year == now.year) {
+      return convertWeekDayToString(aDate.weekday);
     }
-    return aDate.toString();
+    return DateFormat('dd/MM/yyyy').format(convertedDateTime);
+  }
+
+  int weekNumber(DateTime date) {
+    int dayOfYear = int.parse(DateFormat("D").format(date));
+    return ((dayOfYear - date.weekday + 10) / 7).floor();
+  }
+
+  String convertWeekDayToString(int weekday) {
+    switch (weekday) {
+      case 1:
+        return "Monday";
+      case 2:
+        return "Tuesday";
+      case 3:
+        return "Wednesday";
+      case 4:
+        return "Thursday";
+      case 5:
+        return "Friday";
+      case 6:
+        return "Saturday";
+      case 7:
+        return "Sunday";
+      default:
+        return "Monday";
+    }
   }
 }

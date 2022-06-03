@@ -49,6 +49,9 @@ dependencies:
   #connectivity
   connectivity_plus: ^2.3.0
 
+  #intl
+  intl: ^0.17.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
