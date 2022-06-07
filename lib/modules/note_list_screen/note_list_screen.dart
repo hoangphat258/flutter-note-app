@@ -197,9 +197,9 @@ class _NoteListScreenState extends State<NoteListScreen> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => const EditNotePage(
-                                      isCreateNew: true,
-                                    ))).then(
-                                    (value) => _bloc.fetchData(firebaseAuth.currentUser?.uid ?? "")),
+                                          isCreateNew: true,
+                                        ))).then((value) => _bloc.fetchData(
+                                firebaseAuth.currentUser?.uid ?? "")),
                             child: const Icon(
                               Icons.note_add,
                               color: Color(0xffddaf07),
@@ -240,66 +240,71 @@ class _NoteListScreenState extends State<NoteListScreen> {
   }
 
   Widget _buildNoteTile(NoteItem noteItem, isLatest) {
-    return InkWell(
-      onLongPress: () =>
+    return Dismissible(
+      key: UniqueKey(),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) =>
           _bloc.deleteNote(firebaseAuth.currentUser?.uid ?? "", noteItem),
-      onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => EditNotePage(noteItem: noteItem)))
-          .then((value) {
-        if (value is NoteItem) {
-          for (int i = 0; i < _bloc.noteItems.length; i++) {
-            if (value.id == _bloc.noteItems[i].id) {
-              _bloc.noteItems[i] = value;
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => EditNotePage(noteItem: noteItem)))
+            .then((value) {
+          if (value is NoteItem) {
+            for (int i = 0; i < _bloc.noteItems.length; i++) {
+              if (value.id == _bloc.noteItems[i].id) {
+                _bloc.noteItems[i] = value;
+              }
             }
+            //Delay to make sure the database get updated before fetching fresh data
+            Future.delayed(const Duration(milliseconds: 500),
+                () => _bloc.fetchData(firebaseAuth.currentUser?.uid ?? ""));
           }
-          //Delay to make sure the database get updated before fetching fresh data
-          Future.delayed(const Duration(milliseconds: 500),
-              () => _bloc.fetchData(firebaseAuth.currentUser?.uid ?? ""));
-        }
-      }),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            noteItem.title ?? "",
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(noteItem.timestamp.convertTimestampToString()),
-              const SizedBox(
-                width: 8,
+        }),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              noteItem.title ?? "",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w500,
               ),
-              Expanded(
-                child: Text(
-                  noteItem.description ?? "",
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  style: const TextStyle(
-                    fontSize: 18,
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(noteItem.timestamp.convertTimestampToString()),
+                const SizedBox(
+                  width: 8,
+                ),
+                Expanded(
+                  child: Text(
+                    noteItem.description ?? "",
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: const TextStyle(
+                      fontSize: 18,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          !isLatest
-              ? const Divider()
-              : const SizedBox(
-                  height: 8,
-                ),
-        ],
+              ],
+            ),
+            !isLatest
+                ? const Divider()
+                : const SizedBox(
+                    height: 8,
+                  ),
+          ],
+        ),
       ),
     );
   }

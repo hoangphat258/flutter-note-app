@@ -8,7 +8,7 @@ extension NumExtension on int {
     final convertedDateTime = DateTime.fromMillisecondsSinceEpoch(this);
     final aDate = DateTime(convertedDateTime.year, convertedDateTime.month, convertedDateTime.day);
     if(aDate == today) {
-      return "Today";
+      return "${convertedDateTime.hour}:${convertedDateTime.minute}";
     } else if(aDate == yesterday) {
       return "Yesterday";
     } else if (weekNumber(aDate) == weekNumber(now) && aDate.year == now.year) {
